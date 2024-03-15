@@ -1,8 +1,15 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            // Use the Docker image that has Maven installed
+            image 'maven:3.8.4-openjdk-11'
+            // Run the container in privileged mode to allow Docker commands inside
+            args '-u root:root -v /var/run/docker.sock:/var/run/docker.sock'
+        }
+    }
 
     environment {
-        // Define environment variables here
+        // Define your environment variables here
         DOCKER_IMAGE = 'gym14714/carti'  // Replace with your image name
         DOCKER_REGISTRY = 'gym14714'  // Replace with your Docker registry URL
         // Assuming you have added your kubeconfig as a file credential
@@ -19,12 +26,8 @@ pipeline {
 
         stage('Maven Package') {
             steps {
-                script {
-                    // Use Maven Docker image to run Maven commands
-                    docker.image('maven:3.8.4-openjdk-11').inside {
-                        sh 'mvn clean package'
-                    }
-                }
+                // Build the project using Maven
+                sh 'mvn clean package'
             }
         }
 
@@ -58,4 +61,7 @@ pipeline {
             }
         }
     }
+
+    // Post actions if any
 }
+
