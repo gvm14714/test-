@@ -1,19 +1,13 @@
 pipeline {
-    agent {
-        docker {
-            // Use the Docker image that has Maven installed
-            image 'maven:3.8.4-openjdk-11'
-            // Run the container in privileged mode to allow Docker commands inside
-            args '-u root:root -v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    agent any
 
     environment {
-        // Define your environment variables here
+        // Define environment variables here
         DOCKER_IMAGE = 'gym14714/carti'  // Replace with your image name
         DOCKER_REGISTRY = 'gym14714'  // Replace with your Docker registry URL
         // Assuming you have added your kubeconfig as a file credential
         KUBECONFIG_CREDENTIAL_ID = 'my-kubeconfig-file'
+        DOCKER_COMMAND = '/usr/local/bin/docker' // Path to the Docker executable
     }
 
     stages {
@@ -26,8 +20,12 @@ pipeline {
 
         stage('Maven Package') {
             steps {
-                // Build the project using Maven
-                sh 'mvn clean package'
+                script {
+                    // Using Maven Docker image to run Maven commands
+                    docker.image('maven:3.8.4-openjdk-11').inside {
+                        sh 'mvn clean package'
+                    }
+                }
             }
         }
 
@@ -35,7 +33,7 @@ pipeline {
             steps {
                 script {
                     // Build the Docker image
-                    sh "docker build -t ${DOCKER_REGISTRY}/${DOCKER_IMAGE} ."
+                    sh "${DOCKER_COMMAND} build -t ${DOCKER_REGISTRY}/${DOCKER_IMAGE} ."
                 }
             }
         }
@@ -44,7 +42,7 @@ pipeline {
             steps {
                 script {
                     // Push the Docker image to the Docker registry
-                    sh "docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}"
+                    sh "${DOCKER_COMMAND} push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}"
                 }
             }
         }
@@ -61,7 +59,4 @@ pipeline {
             }
         }
     }
-
-    // Post actions if any
 }
-
