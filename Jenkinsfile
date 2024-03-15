@@ -57,13 +57,16 @@ pipeline {
 
     post {
         always {
-            // Clean-up actions, like deleting temporary files, if any
+            // Example: Clean-up actions, like deleting temporary files
+            // sh 'echo "This will always run"'
         }
         success {
-            // Actions to take on success
+            // Example: Actions to take on success
+            // sh 'echo "Build succeeded"'
         }
         failure {
-            // Actions to take on failure
+            // Example: Actions to take on failure
+            // sh 'echo "Build failed"'
         }
     }
 }
