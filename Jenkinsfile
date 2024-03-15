@@ -5,6 +5,8 @@ pipeline {
         // Define environment variables here
         DOCKER_IMAGE = 'gym14714/carti'  // Replace with your image name
         DOCKER_REGISTRY = 'gym14714'  // Replace with your Docker registry URL
+        // Assuming you have added your kubeconfig as a file credential
+        KUBECONFIG_CREDENTIAL_ID = 'my-kubeconfig-file'
     }
 
     stages {
@@ -43,10 +45,11 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    // Set up Minikube context
-                    sh 'eval $(minikube docker-env)'
-                    // Deploy to Kubernetes using kubectl commands
-                    sh 'kubectl apply -f regapp-deploy.yml'
+                    // Use the kubeconfig file
+                    withCredentials([file(credentialsId: KUBECONFIG_CREDENTIAL_ID, variable: 'KUBECONFIG')]) {
+                        // Deploy to Kubernetes using kubectl commands
+                        sh 'kubectl apply -f regapp-deploy.yml'
+                    }
                 }
             }
         }
@@ -64,4 +67,3 @@ pipeline {
         }
     }
 }
-
