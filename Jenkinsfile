@@ -54,19 +54,3 @@ pipeline {
             }
         }
     }
-
-    post {
-        always {
-            // Example: Clean-up actions, like deleting temporary files
-            // sh 'echo "This will always run"'
-        }
-        success {
-            // Example: Actions to take on success
-            // sh 'echo "Build succeeded"'
-        }
-        failure {
-            // Example: Actions to take on failure
-            // sh 'echo "Build failed"'
-        }
-    }
-}
