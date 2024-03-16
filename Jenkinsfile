@@ -8,6 +8,7 @@ pipeline {
         // Assuming you have added your kubeconfig as a file credential
         KUBECONFIG_CREDENTIAL_ID = 'my-kubeconfig-file'
         DOCKER_COMMAND = '/usr/local/bin/docker' // Path to the Docker executable
+        KUBECTL_COMMAND = '/usr/local/bin/kubectl' // Path to the kubectl executable
     }
 
     stages {
@@ -54,11 +55,12 @@ pipeline {
                     // Use the kubeconfig file
                     withCredentials([file(credentialsId: KUBECONFIG_CREDENTIAL_ID, variable: 'KUBECONFIG')]) {
                         // Deploy to Kubernetes using kubectl commands
-                        sh 'kubectl apply -f regapp-deploy.yml'
+                        sh "${KUBECTL_COMMAND} apply -f regapp-deploy.yml"
                     }
                 }
             }
         }
     }
 }
+
 
