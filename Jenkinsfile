@@ -21,10 +21,8 @@ pipeline {
         stage('Maven Package') {
             steps {
                 script {
-                    // Using Maven Docker image to run Maven commands
-                    docker.image('maven:3.8.4-openjdk-11').inside {
-                        sh 'mvn clean package'
-                    }
+                    // Build the project using Maven installed locally
+                    sh '/usr/local/apache-maven/bin/mvn clean package'
                 }
             }
         }
