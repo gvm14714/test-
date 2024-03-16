@@ -14,6 +14,8 @@
   <properties>
     <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>utf-8</project.reporting.outputEncoding>
+    <sonar.host.url>http://localhost:9000/</sonar.host.url>
+    <sonar.login>squ_f36586d207483314720d39e5930f0e59a1789486</sonar.login>
   </properties>
 
   <modules>
@@ -67,6 +69,12 @@
 
             <plugin>
               <artifactId>maven-javadoc-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+            <groupId>org.sonarsource.scanner.maven</groupId>
+            <artifactId>sonar-maven-plugin</artifactId>
+            <version>3.9.0.2155</version> <!-- Use the appropriate version -->
             </plugin>
 
             <plugin>

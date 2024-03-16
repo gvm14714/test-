@@ -5,7 +5,6 @@ pipeline {
         // Define environment variables here
         DOCKER_IMAGE = 'carti'  // Replace with your image name
         DOCKER_REGISTRY = 'gym14714'  // Replace with your Docker registry URL
-        // Assuming you have added your kubeconfig as a file credential
         KUBECONFIG_CREDENTIAL_ID = 'my-kubeconfig-file'
         DOCKER_COMMAND = '/usr/local/bin/docker' // Path to the Docker executable
         KUBECTL_COMMAND = '/usr/local/bin/kubectl' // Path to the kubectl executable
@@ -24,6 +23,17 @@ pipeline {
                 script {
                     // Run Maven commands
                     sh '/usr/local/apache-maven/bin/mvn clean package'
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    // Run SonarQube analysis with secure token
+                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                        sh '/usr/local/apache-maven/bin/mvn sonar:sonar -Dsonar.login=${SONAR_TOKEN}'
+                    }
                 }
             }
         }
