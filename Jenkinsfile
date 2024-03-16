@@ -70,7 +70,15 @@ pipeline {
                 }
             }
         }
+
+        stage('Port Forward Service') {
+            steps {
+                script {
+                    withCredentials([file(credentialsId: KUBECONFIG_CREDENTIAL_ID, variable: 'KUBECONFIG')]) {
+                        sh "${KUBECTL_COMMAND} port-forward svc/regapp-service 5000:8080 &"
+                    }
+                }
+            }
+        }
     }
 }
-
-
