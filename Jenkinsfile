@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         // Define environment variables here
-        DOCKER_IMAGE = 'gym14714/carti'  // Replace with your image name
+        DOCKER_IMAGE = 'carti'  // Replace with your image name
         DOCKER_REGISTRY = 'gym14714'  // Replace with your Docker registry URL
         // Assuming you have added your kubeconfig as a file credential
         KUBECONFIG_CREDENTIAL_ID = 'my-kubeconfig-file'
