@@ -21,7 +21,7 @@ pipeline {
         stage('Maven Package') {
             steps {
                 script {
-                    // Build the project using Maven installed locally
+                    // Run Maven commands
                     sh '/usr/local/apache-maven/bin/mvn clean package'
                 }
             }
@@ -39,8 +39,11 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    // Push the Docker image to the Docker registry
-                    sh "${DOCKER_COMMAND} push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}"
+                    // Push the Docker image to the Docker registry using Docker Hub credentials
+                    withCredentials([usernamePassword(credentialsId: 'Dockerhub-credentials', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                        sh "${DOCKER_COMMAND} login -u ${DOCKERHUB_USERNAME} -p ${DOCKERHUB_PASSWORD}"
+                        sh "${DOCKER_COMMAND} push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}"
+                    }
                 }
             }
         }
@@ -58,3 +61,4 @@ pipeline {
         }
     }
 }
+
