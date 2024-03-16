@@ -3,10 +3,12 @@ pipeline {
 
     environment {
         // Define environment variables here
-        DOCKER_IMAGE = 'gym14714/carti'  // Replace with your image name
+        DOCKER_IMAGE = 'carti'  // Replace with your image name
         DOCKER_REGISTRY = 'gym14714'  // Replace with your Docker registry URL
         // Assuming you have added your kubeconfig as a file credential
         KUBECONFIG_CREDENTIAL_ID = 'my-kubeconfig-file'
+        DOCKER_COMMAND = '/usr/local/bin/docker' // Path to the Docker executable
+        KUBECTL_COMMAND = '/usr/local/bin/kubectl' // Path to the kubectl executable
     }
 
     stages {
@@ -19,8 +21,10 @@ pipeline {
 
         stage('Maven Package') {
             steps {
-                // Build the project using Maven
-                sh 'mvn clean package'
+                script {
+                    // Run Maven commands
+                    sh '/usr/local/apache-maven/bin/mvn clean package'
+                }
             }
         }
 
@@ -28,7 +32,7 @@ pipeline {
             steps {
                 script {
                     // Build the Docker image
-                    sh "docker build -t ${DOCKER_REGISTRY}/${DOCKER_IMAGE} ."
+                    sh "${DOCKER_COMMAND} build -t ${DOCKER_REGISTRY}/${DOCKER_IMAGE} ."
                 }
             }
         }
@@ -36,8 +40,11 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    // Push the Docker image to the Docker registry
-                    sh "docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}"
+                    // Push the Docker image to the Docker registry using Docker Hub credentials
+                    withCredentials([usernamePassword(credentialsId: 'Dockerhub-credentials', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                        sh "${DOCKER_COMMAND} login -u ${DOCKERHUB_USERNAME} -p ${DOCKERHUB_PASSWORD}"
+                        sh "${DOCKER_COMMAND} push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}"
+                    }
                 }
             }
         }
@@ -48,22 +55,12 @@ pipeline {
                     // Use the kubeconfig file
                     withCredentials([file(credentialsId: KUBECONFIG_CREDENTIAL_ID, variable: 'KUBECONFIG')]) {
                         // Deploy to Kubernetes using kubectl commands
-                        sh 'kubectl apply -f regapp-deploy.yml'
+                        sh "${KUBECTL_COMMAND} apply -f regapp-deploy.yml"
                     }
                 }
             }
         }
     }
-
-    post {
-        always {
-            // Clean-up actions, like deleting temporary files, if any
-        }
-        success {
-            // Actions to take on success
-        }
-        failure {
-            // Actions to take on failure
-        }
-    }
 }
+
+
